@@ -24,7 +24,10 @@ const UserBookings = ({ token, userId }) => {
                 console.log("checking for user bookings:", response);
             } catch (error) {
                 console.log("fetching details failed:", error);
-                setBookingError(error.response?.message);
+                setBookingError(
+                    error.response?.data?.detail ||
+                    "Unable to load your bookings. Please try again."
+                );
             }
         };
 
@@ -33,9 +36,10 @@ const UserBookings = ({ token, userId }) => {
 
     return (
         <div>
+            {bookingError && <p role="alert">{bookingError}</p>}
             {bookings.map((item) => {
                 return (
-                    <div>
+                    <div key={item.id}>
                         {item.user}-
                         {item.bus}-
                         {item.seat}-

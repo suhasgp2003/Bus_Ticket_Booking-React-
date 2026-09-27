@@ -20,8 +20,17 @@ const RegisterForm = () => {
             await axios.post('http://localhost:8000/api/register/', form);
             setMessage('Registration successfull!');
         } catch (error) {
-            setMessage("Registation failed",+(error.response?.data?.username || error.message));
-        }
+  const data = error.response?.data;
+
+  const errorMessage =
+    data?.username?.[0] ||
+    data?.email?.[0] ||
+    data?.password?.[0] ||
+    data?.detail ||
+    "Registration failed. Please try again.";
+
+  setMessage(errorMessage);
+}
     };
 
   return (

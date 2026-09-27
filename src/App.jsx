@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import RegisterForm from './components/RegisterForm';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import LoginForm from './components/LoginForm';
 import BusList from './components/BusList';
 import BusSeats from './components/BusSeats';
@@ -8,9 +8,9 @@ import UserBookings from './components/UserBookings';
 import Wrapper from './components/Wrapper';
 
 const App = () => {
+  const navigate = useNavigate();
   const [token, setToken]=useState(localStorage.getItem('token'))
   const [userId, setUserId]=useState(localStorage.getItem('userId'))
-  const [selectedBusId, setSelectedBusId]= useState(null)
   const handlelogin =(token, userId)=>{
     localStorage.setItem('token',token)
     localStorage.setItem('userId',userId)
@@ -22,13 +22,13 @@ const App = () => {
     localStorage.removeItem('userId');
     setToken(null)
     setUserId(null)
-    setSelectedBusId(null)
+    navigate('/login');
   }
   return (
     <div>
       <Wrapper  token={token} handlelogout = {handlelogout}>
       <Routes>
-        <Route path='/' element={<BusList onSelectBus={(id)=>setSelectedBusId(id)} token={token} />} />
+        <Route path='/' element={<BusList />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/login" element={<LoginForm onLogin={handlelogin}/>}/>
         <Route path="/bus/:busId" element={<BusSeats token={token} />} />
