@@ -6,6 +6,7 @@ const UserBookings = ({ token, userId }) => {
   const [bookings, setBookings] = useState([]);
   const [bookingError, setBookingError] = useState(null);
   const [isLoading, setIsLoading] = useState(Boolean(token && userId));
+  const [cancellingSeatIds, setCancellingSeatIds] = useState([]);
 
   useEffect(() => {
     if (!token || !userId) return;
@@ -36,6 +37,39 @@ const UserBookings = ({ token, userId }) => {
 
     fetchBookings();
   }, [token, userId]);
+
+  const handleCancelBooking = async (booking) => {
+    const seatId = booking.seat?.id;
+    if (!seatId || cancellingSeatIds.includes(seatId)) return;
+
+    const seatNumber = booking.seat?.seat_number || "this seat";
+    if (!window.confirm(`Cancel your booking for seat ${seatNumber}?`)) return;
+
+    setCancellingSeatIds((currentIds) => [...currentIds, seatId]);
+    try {
+      const response = await axios.delete(
+        "http://localhost:8000/api/booking/cancel/",
+        {
+          headers: { Authorization: `Token ${token}` },
+          data: { seats: [seatId] },
+        },
+      );
+      setBookings((currentBookings) =>
+        currentBookings.filter((item) => item.id !== booking.id),
+      );
+      alert(response.data?.message || "Booking cancelled successfully.");
+    } catch (error) {
+      alert(
+        error.response?.data?.error ||
+          error.response?.data?.detail ||
+          "Unable to cancel this booking. Please try again.",
+      );
+    } finally {
+      setCancellingSeatIds((currentIds) =>
+        currentIds.filter((id) => id !== seatId),
+      );
+    }
+  };
 
   if (!token || !userId) {
     return <Navigate to="/login" replace />;
@@ -80,9 +114,19 @@ const UserBookings = ({ token, userId }) => {
       </p>
     </div>
 
-    <span className="w-fit rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700">
-      Confirmed
-    </span>
+    <div className="flex w-fit items-center gap-2">
+      <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700">
+        Confirmed
+      </span>
+      <button
+        type="button"
+        disabled={!item.seat?.id || cancellingSeatIds.includes(item.seat.id)}
+        onClick={() => handleCancelBooking(item)}
+        className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {cancellingSeatIds.includes(item.seat?.id) ? "Cancelling..." : "Cancel seat"}
+      </button>
+    </div>
   </article>
 ))}
         </div>

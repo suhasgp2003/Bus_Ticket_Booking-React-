@@ -2,6 +2,15 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 
+const sortSeatsByNumber = (seatList) =>
+  [...seatList].sort((firstSeat, secondSeat) =>
+    String(firstSeat.seat_number).localeCompare(
+      String(secondSeat.seat_number),
+      undefined,
+      { numeric: true, sensitivity: "base" },
+    ),
+  );
+
 const BusSeats = ({ token }) => {
   const [bus, setBus] = useState(null);
   const [seats, setSeats] = useState([]);
@@ -15,7 +24,7 @@ const BusSeats = ({ token }) => {
       try {
         const response = await axios.get(`http://localhost:8000/api/buses/${busId}/`);
         setBus(response.data);
-        setSeats(response.data.seats || []);
+        setSeats(sortSeatsByNumber(response.data.seats || []));
         setSelectedSeatIds([]);
       } catch (error) {
         console.log("Error fetching bus details:", error);
