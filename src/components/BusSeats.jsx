@@ -5,7 +5,8 @@ import { useNavigate, useParams } from "react-router-dom";
 const BusSeats = ({ token }) => {
   const [bus, setBus] = useState(null);
   const [seats, setSeats] = useState([]);
-  const [bookingSeatId, setBookingSeatId] = useState(null);
+  const [selectedSeatIds, setSelectedSeatIds] = useState([]);
+  const [isBooking, setIsBooking] = useState(false);
   const { busId } = useParams();
   const navigate = useNavigate();
 
@@ -15,6 +16,7 @@ const BusSeats = ({ token }) => {
         const response = await axios.get(`http://localhost:8000/api/buses/${busId}/`);
         setBus(response.data);
         setSeats(response.data.seats || []);
+        setSelectedSeatIds([]);
       } catch (error) {
         console.log("Error fetching bus details:", error);
       }
@@ -23,33 +25,48 @@ const BusSeats = ({ token }) => {
     fetchBusDetails();
   }, [busId]);
 
-  const handleBookSeat = async (seatId) => {
+  const toggleSeat = (seatId) => {
+    const seat = seats.find((item) => item.id === seatId);
+    if (seat?.is_booked || isBooking) return;
+
+    setSelectedSeatIds((currentIds) =>
+      currentIds.includes(seatId)
+        ? currentIds.filter((id) => id !== seatId)
+        : [...currentIds, seatId],
+    );
+  };
+
+  const selectedSeats = seats.filter((seat) => selectedSeatIds.includes(seat.id));
+  const fare = Number(bus?.fare ?? bus?.price ?? bus?.ticket_price ?? 0);
+  const totalPrice = selectedSeats.length * fare;
+
+  const handleBookSeats = async () => {
     if (!token) {
       alert("Please login to book a seat.");
       navigate("/login");
       return;
     }
 
-    const seat = seats.find((item) => item.id === seatId);
-    if (seat?.is_booked || bookingSeatId !== null) return;
+    if (selectedSeatIds.length === 0 || isBooking) return;
 
-    setBookingSeatId(seatId);
+    setIsBooking(true);
     try {
       await axios.post(
         "http://localhost:8000/api/booking/",
-        { seat: seatId },
+        { seats: selectedSeatIds },
         { headers: { Authorization: `Token ${token}` } },
       );
       setSeats((currentSeats) =>
         currentSeats.map((item) =>
-          item.id === seatId ? { ...item, is_booked: true } : item,
+          selectedSeatIds.includes(item.id) ? { ...item, is_booked: true } : item,
         ),
       );
-      alert("Seat booked successfully!");
+      setSelectedSeatIds([]);
+      alert(`${selectedSeatIds.length} seat${selectedSeatIds.length === 1 ? "" : "s"} booked successfully!`);
     } catch (error) {
       alert(error.response?.data?.error || "Booking failed. Please try again.");
     } finally {
-      setBookingSeatId(null);
+      setIsBooking(false);
     }
   };
 
@@ -78,6 +95,7 @@ const BusSeats = ({ token }) => {
           <h2 className="text-lg font-bold text-slate-900">Seat map</h2>
           <div className="flex flex-wrap gap-3 text-xs font-medium text-slate-600">
             <span><i className="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-green-600" />Available</span>
+            <span><i className="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-blue-600" />Selected</span>
             <span><i className="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-red-500" />Booked</span>
           </div>
         </div>
@@ -86,23 +104,44 @@ const BusSeats = ({ token }) => {
             <button
               key={seat.id}
               type="button"
-              disabled={seat.is_booked || bookingSeatId !== null}
-              onClick={() => handleBookSeat(seat.id)}
+              aria-pressed={selectedSeatIds.includes(seat.id)}
+              disabled={seat.is_booked || isBooking}
+              onClick={() => toggleSeat(seat.id)}
               className={`min-h-12 rounded-lg px-2 py-3 text-xs font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-offset-2 sm:px-3 sm:text-sm ${
                 seat.is_booked
                   ? "cursor-not-allowed bg-red-500 opacity-100"
-                  : bookingSeatId === seat.id
-                    ? "cursor-wait bg-amber-500"
+                  : selectedSeatIds.includes(seat.id)
+                    ? "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
                     : "bg-green-600 hover:bg-green-700 focus:ring-green-500"
               }`}
             >
               {seat.is_booked
                 ? `Seat ${seat.seat_number} - Booked`
-                : bookingSeatId === seat.id
-                  ? "Booking..."
-                  : `Seat ${seat.seat_number}`}
+                : `Seat ${seat.seat_number}`}
             </button>
           ))}
+        </div>
+
+        <div className="mt-6 flex flex-col gap-3 rounded-xl bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-slate-900">
+              {selectedSeats.length} seat{selectedSeats.length === 1 ? "" : "s"} selected
+            </p>
+            <p className="mt-1 text-sm text-slate-600">
+              {selectedSeats.length > 0
+                ? `Seats: ${selectedSeats.map((seat) => seat.seat_number).join(", ")}`
+                : "Choose one or more available seats."}
+              {fare > 0 && ` Total: ₹${totalPrice.toFixed(2)}`}
+            </p>
+          </div>
+          <button
+            type="button"
+            disabled={selectedSeatIds.length === 0 || isBooking}
+            onClick={handleBookSeats}
+            className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300"
+          >
+            {isBooking ? "Booking..." : "Book selected seats"}
+          </button>
         </div>
       </div>
     </section>
