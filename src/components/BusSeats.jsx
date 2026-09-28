@@ -11,7 +11,7 @@ const sortSeatsByNumber = (seatList) =>
     ),
   );
 
-const BusSeats = ({ token }) => {
+const BusSeats = ({ token, notify }) => {
   const [bus, setBus] = useState(null);
   const [seats, setSeats] = useState([]);
   const [selectedSeatIds, setSelectedSeatIds] = useState([]);
@@ -51,7 +51,7 @@ const BusSeats = ({ token }) => {
 
   const handleBookSeats = async () => {
     if (!token) {
-      alert("Please login to book a seat.");
+      notify("Please login to book a seat.", "error");
       navigate("/login");
       return;
     }
@@ -71,9 +71,9 @@ const BusSeats = ({ token }) => {
         ),
       );
       setSelectedSeatIds([]);
-      alert(`${selectedSeatIds.length} seat${selectedSeatIds.length === 1 ? "" : "s"} booked successfully!`);
+      notify(`${selectedSeatIds.length} seat${selectedSeatIds.length === 1 ? "" : "s"} booked successfully!`);
     } catch (error) {
-      alert(error.response?.data?.error || "Booking failed. Please try again.");
+      notify(error.response?.data?.error || "Booking failed. Please try again.", "error");
     } finally {
       setIsBooking(false);
     }

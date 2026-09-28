@@ -1,12 +1,14 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
+import ConfirmationDialog from "./ConfirmationDialog";
 
-const UserBookings = ({ token, userId }) => {
+const UserBookings = ({ token, userId, notify }) => {
   const [bookings, setBookings] = useState([]);
   const [bookingError, setBookingError] = useState(null);
   const [isLoading, setIsLoading] = useState(Boolean(token && userId));
   const [cancellingSeatIds, setCancellingSeatIds] = useState([]);
+  const [bookingToCancel, setBookingToCancel] = useState(null);
 
   useEffect(() => {
     if (!token || !userId) return;
@@ -42,9 +44,6 @@ const UserBookings = ({ token, userId }) => {
     const seatId = booking.seat?.id;
     if (!seatId || cancellingSeatIds.includes(seatId)) return;
 
-    const seatNumber = booking.seat?.seat_number || "this seat";
-    if (!window.confirm(`Cancel your booking for seat ${seatNumber}?`)) return;
-
     setCancellingSeatIds((currentIds) => [...currentIds, seatId]);
     try {
       const response = await axios.delete(
@@ -57,18 +56,31 @@ const UserBookings = ({ token, userId }) => {
       setBookings((currentBookings) =>
         currentBookings.filter((item) => item.id !== booking.id),
       );
-      alert(response.data?.message || "Booking cancelled successfully.");
+      notify(response.data?.message || "Booking cancelled successfully.");
     } catch (error) {
-      alert(
+      notify(
         error.response?.data?.error ||
           error.response?.data?.detail ||
           "Unable to cancel this booking. Please try again.",
+        "error",
       );
     } finally {
       setCancellingSeatIds((currentIds) =>
         currentIds.filter((id) => id !== seatId),
       );
     }
+  };
+
+  const openCancellationDialog = (booking) => {
+    if (booking.seat?.id && !cancellingSeatIds.includes(booking.seat.id)) {
+      setBookingToCancel(booking);
+    }
+  };
+
+  const confirmCancellation = () => {
+    const booking = bookingToCancel;
+    setBookingToCancel(null);
+    if (booking) handleCancelBooking(booking);
   };
 
   if (!token || !userId) {
@@ -121,7 +133,7 @@ const UserBookings = ({ token, userId }) => {
       <button
         type="button"
         disabled={!item.seat?.id || cancellingSeatIds.includes(item.seat.id)}
-        onClick={() => handleCancelBooking(item)}
+        onClick={() => openCancellationDialog(item)}
         className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {cancellingSeatIds.includes(item.seat?.id) ? "Cancelling..." : "Cancel seat"}
@@ -131,6 +143,14 @@ const UserBookings = ({ token, userId }) => {
 ))}
         </div>
       )}
+      <ConfirmationDialog
+        isOpen={Boolean(bookingToCancel)}
+        title="Cancel this seat?"
+        message={`Are you sure you want to cancel seat ${bookingToCancel?.seat?.seat_number || ""}?`}
+        confirmLabel="Cancel booking"
+        onCancel={() => setBookingToCancel(null)}
+        onConfirm={confirmCancellation}
+      />
     </section>
   );
 };
