@@ -95,7 +95,15 @@ const UserBookings = ({ token, userId, notify }) => {
       </div>
 
       {isLoading ? (
-        <p className="rounded-xl bg-white p-8 text-center text-slate-500 shadow-sm ring-1 ring-slate-200">Loading your bookings...</p>
+        <div className="space-y-3" aria-label="Loading bookings">
+          {Array.from({ length: 3 }, (_, index) => (
+            <div key={index} className="animate-pulse rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+              <div className="h-5 w-48 rounded bg-slate-200" />
+              <div className="mt-3 h-4 w-64 max-w-full rounded bg-slate-100" />
+              <div className="mt-2 h-4 w-36 rounded bg-slate-100" />
+            </div>
+          ))}
+        </div>
       ) : bookingError ? (
         <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">{bookingError}</p>
       ) : bookings.length === 0 ? (
