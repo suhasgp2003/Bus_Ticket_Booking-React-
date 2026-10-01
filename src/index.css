@@ -1,1 +1,31 @@
 @import "tailwindcss";
+
+/* Theme colors are scoped to the application so the selected preference affects every route. */
+.theme-dark {
+  color-scheme: dark;
+  background-color: #0f172a;
+}
+
+.theme-dark .bg-white { background-color: #1e293b; }
+.theme-dark .bg-slate-50 { background-color: #172033; }
+.theme-dark .bg-slate-100 { background-color: #0f172a; }
+.theme-dark .bg-slate-200 { background-color: #334155; }
+.theme-dark .bg-slate-800 { background-color: #020617; }
+.theme-dark .bg-slate-900 { background-color: #020617; }
+.theme-dark .text-slate-900 { color: #f8fafc; }
+.theme-dark .text-slate-700 { color: #cbd5e1; }
+.theme-dark .text-slate-600 { color: #cbd5e1; }
+.theme-dark .text-slate-500 { color: #94a3b8; }
+.theme-dark .text-slate-400 { color: #94a3b8; }
+.theme-dark .text-slate-300 { color: #cbd5e1; }
+.theme-dark .border-slate-100 { border-color: #334155; }
+.theme-dark .border-slate-200 { border-color: #475569; }
+.theme-dark .border-slate-300 { border-color: #64748b; }
+.theme-dark .ring-slate-200 { --tw-ring-color: #475569; }
+.theme-dark .shadow-slate-200\/70 { --tw-shadow-color: rgb(15 23 42 / 0.7); }
+.theme-dark input { background-color: #0f172a; color: #f8fafc; }
+.theme-dark .bg-blue-50 { background-color: #172554; }
+.theme-dark .bg-green-50 { background-color: #052e16; }
+.theme-dark .bg-red-50 { background-color: #450a0a; }
+.theme-dark .text-red-900 { color: #fecaca; }
+.theme-dark .text-red-700 { color: #fca5a5; }

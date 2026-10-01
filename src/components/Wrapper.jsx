@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const Wrapper = ({token, handlelogout, children}) => {
+const Wrapper = ({ token, handlelogout, theme, onThemeToggle, children }) => {
     const logout=()=>{
         handlelogout()
     }
@@ -11,6 +11,15 @@ const Wrapper = ({token, handlelogout, children}) => {
               <Link to="/" className="mr-auto text-xl font-bold tracking-tight text-blue-700">
                 BusGo
               </Link>
+              <button
+                type="button"
+                onClick={onThemeToggle}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-sm transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                aria-pressed={theme === 'dark'}
+              >
+                <span aria-hidden="true">{theme === 'dark' ? '☀️' : '🌙'}</span>
+              </button>
               {token ? (
                 <div className="flex w-full items-center justify-end gap-3 sm:w-auto">
                   <Link

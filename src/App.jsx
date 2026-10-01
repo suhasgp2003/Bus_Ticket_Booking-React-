@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import RegisterForm from './components/RegisterForm';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import LoginForm from './components/LoginForm';
@@ -13,6 +13,12 @@ const App = () => {
   const [token, setToken]=useState(localStorage.getItem('token'))
   const [userId, setUserId]=useState(localStorage.getItem('userId'))
   const [toast, setToast] = useState(null);
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+    document.documentElement.style.colorScheme = theme;
+  }, [theme]);
   const showToast = (message, type = 'success') => {
     setToast({ id: Date.now(), message, type });
   };
@@ -30,8 +36,13 @@ const App = () => {
     navigate('/login');
   }
   return (
-    <div>
-      <Wrapper  token={token} handlelogout = {handlelogout}>
+    <div className={theme === 'dark' ? 'theme-dark' : ''}>
+      <Wrapper
+        token={token}
+        handlelogout={handlelogout}
+        theme={theme}
+        onThemeToggle={() => setTheme((currentTheme) => currentTheme === 'dark' ? 'light' : 'dark')}
+      >
       <Routes>
         <Route path='/' element={<BusList />} />
         <Route path="/register" element={<RegisterForm />} />
