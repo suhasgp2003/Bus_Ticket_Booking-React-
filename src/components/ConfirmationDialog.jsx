@@ -25,7 +25,7 @@ const ConfirmationDialog = ({ isOpen, title, message, confirmLabel, onCancel, on
             onClick={onCancel}
             className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
           >
-            Go back
+            Back
           </button>
           <button
             type="button"
