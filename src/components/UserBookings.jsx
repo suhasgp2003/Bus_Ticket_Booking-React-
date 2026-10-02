@@ -47,7 +47,7 @@ const UserBookings = ({ token, userId, notify }) => {
     setCancellingSeatIds((currentIds) => [...currentIds, seatId]);
     try {
       const response = await axios.delete(
-        "http://localhost:8000/api/booking/cancel/",
+        `${import.meta.env.VITE_API_URL}/booking/cancel/`,
         {
           headers: { Authorization: `Token ${token}` },
           data: { seats: [seatId] },

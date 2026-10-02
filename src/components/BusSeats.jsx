@@ -115,7 +115,7 @@ const BusSeats = ({ token, notify }) => {
     setIsBooking(true);
     try {
       await axios.post(
-        "http://localhost:8000/api/booking/",
+         `${import.meta.env.VITE_API_URL}/booking/`,
         { seats: selectedSeatIds },
         { headers: { Authorization: `Token ${token}` } },
       );
