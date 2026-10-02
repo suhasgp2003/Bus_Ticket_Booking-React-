@@ -6,6 +6,8 @@ const BusList = () => {
     const [buses, setBuses] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [loadError, setLoadError] = useState(null);
+    const [filters, setFilters] = useState({ search: '', from: '', to: '' });
+    const [submittedFilters, setSubmittedFilters] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -29,6 +31,34 @@ const BusList = () => {
     const handleViewSeats = (id) => {
         navigate(`/bus/${id}`);
     };
+
+    const handleFilterChange = ({ target: { name, value } }) => {
+        setFilters((currentFilters) => ({ ...currentFilters, [name]: value }));
+    };
+
+    const handleFilterSubmit = (event) => {
+        event.preventDefault();
+        setSubmittedFilters({
+            search: filters.search.trim().toLowerCase(),
+            from: filters.from.trim().toLowerCase(),
+            to: filters.to.trim().toLowerCase(),
+        });
+    };
+
+    const handleClearFilters = () => {
+        setFilters({ search: '', from: '', to: '' });
+        setSubmittedFilters(null);
+    };
+
+    const filteredBuses = submittedFilters
+        ? buses.filter((bus) => {
+            const searchableBusDetails = `${bus.bus_name || ''} ${bus.bus_number || ''}`.toLowerCase();
+            return searchableBusDetails.includes(submittedFilters.search)
+                && (bus.origin || '').toLowerCase().includes(submittedFilters.from)
+                && (bus.destination || '').toLowerCase().includes(submittedFilters.to);
+        })
+        : buses;
+
     return (
         <section>
             <div className="mb-7">
@@ -36,6 +66,47 @@ const BusList = () => {
                 <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Available buses</h1>
                 <p className="mt-2 text-slate-600">Choose a route and reserve your preferred seat.</p>
             </div>
+            <form onSubmit={handleFilterSubmit} className="mb-7 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-5">
+                <div className="grid gap-4 md:grid-cols-3">
+                    <label className="block text-sm font-semibold text-slate-700">
+                        Search
+                        <input
+                            name="search"
+                            type="search"
+                            value={filters.search}
+                            onChange={handleFilterChange}
+                            placeholder="Bus name or number"
+                            className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                        />
+                    </label>
+                    <label className="block text-sm font-semibold text-slate-700">
+                        From
+                        <input
+                            name="from"
+                            type="text"
+                            value={filters.from}
+                            onChange={handleFilterChange}
+                            placeholder="Departure city"
+                            className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                        />
+                    </label>
+                    <label className="block text-sm font-semibold text-slate-700">
+                        To
+                        <input
+                            name="to"
+                            type="text"
+                            value={filters.to}
+                            onChange={handleFilterChange}
+                            placeholder="Destination city"
+                            className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                        />
+                    </label>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-3">
+                    <button type="submit" className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Search buses</button>
+                    {submittedFilters && <button type="button" onClick={handleClearFilters} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Clear filters</button>}
+                </div>
+            </form>
             {isLoading ? (
               <div className="grid gap-4 md:grid-cols-2" aria-label="Loading buses">
                 {Array.from({ length: 4 }, (_, index) => (
@@ -52,11 +123,11 @@ const BusList = () => {
                 <p className="font-semibold text-red-900">Could not load buses</p>
                 <p className="mt-1 text-sm text-red-700">{loadError}</p>
               </div>
-            ) : buses.length === 0 ? (
-              <p className="rounded-xl bg-white p-6 text-center text-slate-500 shadow-sm ring-1 ring-slate-200">No buses are available right now.</p>
+            ) : filteredBuses.length === 0 ? (
+              <p className="rounded-xl bg-white p-6 text-center text-slate-500 shadow-sm ring-1 ring-slate-200">{submittedFilters ? 'No buses match your search.' : 'No buses are available right now.'}</p>
             ) : (
             <div className="grid gap-4 md:grid-cols-2">
-            {buses.map((item) => (
+            {filteredBuses.map((item) => (
                 <article key={item.id} className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md sm:p-5">
                     <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:gap-4">
                         <div>

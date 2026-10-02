@@ -9,7 +9,7 @@ const Wrapper = ({ token, handlelogout, theme, onThemeToggle, children }) => {
           <header className="border-b border-slate-200 bg-white shadow-sm">
             <nav className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
               <Link to="/" className="mr-auto text-xl font-bold tracking-tight text-blue-700">
-                BusGo
+                GoBus
               </Link>
               <button
                 type="button"
