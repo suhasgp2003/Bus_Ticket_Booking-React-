@@ -15,7 +15,7 @@ const BusList = () => {
             setIsLoading(true);
             setLoadError(null);
             try {
-                const response = await axios.get('http://localhost:8000/api/buses/');
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/buses/`);
                 setBuses(response.data);
             } catch (error) {
                 console.log('Error fetching buses:', error);

@@ -19,7 +19,7 @@ const UserBookings = ({ token, userId, notify }) => {
 
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/user/${userId}/bookings/`,
+          `${import.meta.env.VITE_API_URL}/user/${userId}/bookings/`,
           { headers: { Authorization: `Token ${token}` } },
         );
         const responseBookings = Array.isArray(response.data)

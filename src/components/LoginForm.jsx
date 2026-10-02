@@ -18,7 +18,7 @@ const LoginForm = ({onLogin}) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8000/api/login/', form);
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/login/`, form);
             setMessage('User logged in successfully!');
             if(onLogin){
                 onLogin(response.data.token, response.data.user_id

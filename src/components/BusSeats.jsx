@@ -26,7 +26,7 @@ const BusSeats = ({ token, notify }) => {
       setIsLoading(true);
       setLoadError(null);
       try {
-        const response = await axios.get(`http://localhost:8000/api/buses/${busId}/`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/buses/${busId}/`);
         setBus(response.data);
         setSeats(sortSeatsByNumber(response.data.seats || []));
         setSelectedSeatIds([]);
