@@ -51,7 +51,7 @@ const App = () => {
         <Route path="/buses" element={token ? <BusList /> : <Navigate to="/login" replace />} />
         <Route path="/bus/:busId" element={token ? <BusSeats token={token} notify={showToast} /> : <Navigate to="/login" replace />} />
         <Route path="/my-bookings" element={token ? <UserBookings token={token} userId={userId} notify={showToast} /> : <Navigate to="/login" replace />} />
-        <Routes path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       </Wrapper>
       <Toast toast={toast} onDismiss={() => setToast(null)} />
