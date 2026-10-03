@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import RegisterForm from './components/RegisterForm';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import LoginForm from './components/LoginForm';
 import BusList from './components/BusList';
 import BusSeats from './components/BusSeats';
@@ -27,6 +27,7 @@ const App = () => {
     localStorage.setItem('userId',userId)
     setToken(token)
     setUserId(userId)
+    navigate('/buses', { replace: true });
   }
   const handlelogout = () => {
     localStorage.removeItem('token');
@@ -44,11 +45,13 @@ const App = () => {
         onThemeToggle={() => setTheme((currentTheme) => currentTheme === 'dark' ? 'light' : 'dark')}
       >
       <Routes>
-        <Route path='/' element={<BusList />} />
+        <Route path='/' element={<Navigate to={token ? "/buses" : "/login"}replace />} />       
+        <Route path="/login" element={token? <Navigate to="/buses" replace /> : <LoginForm onLogin={handlelogin}/>}/>
         <Route path="/register" element={<RegisterForm />} />
-        <Route path="/login" element={<LoginForm onLogin={handlelogin}/>}/>
-        <Route path="/bus/:busId" element={<BusSeats token={token} notify={showToast} />} />
-        <Route path="/my-bookings" element={<UserBookings token={token} userId={userId} notify={showToast} />} />
+        <Route path="/buses" element={token ? <BusList /> : <Navigate to="/login" replace />} />
+        <Route path="/bus/:busId" element={token ? <BusSeats token={token} notify={showToast} /> : <Navigate to="/login" replace />} />
+        <Route path="/my-bookings" element={token ? <UserBookings token={token} userId={userId} notify={showToast} /> : <Navigate to="/login" replace />} />
+        <Routes path="*" element={<Navigate to="/" replace />} />
       </Routes>
       </Wrapper>
       <Toast toast={toast} onDismiss={() => setToast(null)} />
