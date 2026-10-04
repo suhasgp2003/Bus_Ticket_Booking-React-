@@ -69,11 +69,16 @@ const BusSeats = ({ token, notify }) => {
       seats: [...row.seats].sort((firstSeat, secondSeat) => firstSeat.column - secondSeat.column),
     }));
   const layoutColumns = [...new Set(seats.map((seat) => seat.column))].sort((first, second) => first - second);
+  const aisleColumn = Math.ceil(layoutColumns.length / 2) + 1;
+  const seatGridStyle = {
+    gridTemplateColumns: layoutColumns
+      .map((_, index) => `${index + 1 === aisleColumn ? "1.5rem " : ""}minmax(0, 1fr)`)
+      .join(" "),
+  };
 
   const getGridColumn = (seat) => {
     const columnIndex = layoutColumns.indexOf(seat.column);
-    if (layoutColumns.length === 4) return columnIndex < 2 ? columnIndex + 1 : columnIndex + 2;
-    return seat.column;
+    return columnIndex + 1 < aisleColumn ? columnIndex + 1 : columnIndex + 2;
   };
 
   const renderSeat = (seat) => {
@@ -162,7 +167,7 @@ const BusSeats = ({ token, notify }) => {
 
   if (loadError) {
     return (
-      <section className="rounded-2xl bg-red-50 p-6 text-center shadow-sm ring-1 ring-red-200">
+      <section role="alert" className="rounded-2xl bg-red-50 p-6 text-center shadow-sm ring-1 ring-red-200">
         <h1 className="text-lg font-bold text-red-900">Could not load seats</h1>
         <p className="mt-2 text-sm text-red-700">{loadError}</p>
         <button type="button" onClick={() => window.location.reload()} className="mt-4 min-h-11 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2">
@@ -236,16 +241,22 @@ const BusSeats = ({ token, notify }) => {
                   </svg>
                 </div>
               </div>
-              <div className="mb-3 grid grid-cols-[1fr_1fr_1.5rem_1fr_1fr] gap-2 text-center text-[9px] font-semibold uppercase tracking-wide text-slate-500">
-                <span className="col-span-2">Window side</span>
-                <span aria-label="Aisle">&darr;</span>
-                <span className="col-span-2">Window side</span>
+              <div style={seatGridStyle} className="mb-3 grid gap-2 text-center text-[9px] font-semibold uppercase tracking-wide text-slate-500">
+                <span style={{ gridColumn: `1 / ${aisleColumn}` }}>Window side</span>
+                {layoutColumns.length > 1 && (
+                  <>
+                    <span style={{ gridColumnStart: aisleColumn }} aria-label="Aisle">&darr;</span>
+                    <span style={{ gridColumn: `${aisleColumn + 1} / -1` }}>Window side</span>
+                  </>
+                )}
               </div>
               <div className="space-y-3">
                 {seatRows.map((row) => (
-                  <div key={row.rowNumber} className="grid grid-cols-[1fr_1fr_1.5rem_1fr_1fr] items-center gap-2">
+                  <div key={row.rowNumber} style={seatGridStyle} className="grid items-center gap-2">
                     {row.seats.map(renderSeat)}
-                    <span style={{ gridColumnStart: 3, gridRowStart: 1 }} className="text-center text-[10px] font-medium text-slate-500" aria-label={`Row ${row.rowNumber}`}>{row.rowNumber}</span>
+                    {layoutColumns.length > 1 && (
+                      <span style={{ gridColumnStart: aisleColumn, gridRowStart: 1 }} className="text-center text-[10px] font-medium text-slate-500" aria-label={`Row ${row.rowNumber}`}>{row.rowNumber}</span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -255,7 +266,7 @@ const BusSeats = ({ token, notify }) => {
           <p className="mt-5 text-center text-xs leading-5 text-slate-500">Tap a selected seat again to remove it.</p>
         </div>
 
-        <aside className="rounded-2xl border border-slate-200 bg-white shadow-sm lg:sticky lg:top-6" aria-labelledby="fare-summary-title">
+        <aside className="rounded-2xl border border-slate-200 bg-white shadow-sm lg:sticky lg:top-6 lg:max-h-[calc(100dvh-3rem)] lg:overflow-y-auto" aria-labelledby="fare-summary-title">
           <div className="border-b border-slate-100 p-5 sm:p-6">
             <h2 id="fare-summary-title" className="text-lg font-bold text-slate-900">Booking summary</h2>
             <p className="mt-1 text-sm text-slate-500">Your seats and fare, at a glance.</p>
@@ -285,7 +296,12 @@ const BusSeats = ({ token, notify }) => {
                   <dd className="font-semibold text-slate-900">{selectedSeats.length}</dd>
                 </div>
                 <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
-                  <dt className="font-bold text-slate-900">Total fare</dt>
+                  <dt className="font-bold text-slate-900">
+                    Total fare
+                    {fare > 0 && selectedSeats.length > 0 && (
+                      <span className="mt-1 block text-xs font-normal text-slate-500">{selectedSeats.length} × ₹{fare.toFixed(2)}</span>
+                    )}
+                  </dt>
                   <dd className="text-2xl font-bold tracking-tight text-slate-900">{fare > 0 ? `₹${totalPrice.toFixed(2)}` : "—"}</dd>
                 </div>
               </dl>
