@@ -5,6 +5,7 @@ import LoginForm from './components/LoginForm';
 import BusList from './components/BusList';
 import BusSeats from './components/BusSeats';
 import UserBookings from './components/UserBookings';
+import Dashboard from './components/Dashboard';
 import Wrapper from './components/Wrapper';
 import Toast from './components/Toast';
 
@@ -27,7 +28,7 @@ const App = () => {
     localStorage.setItem('userId',userId)
     setToken(token)
     setUserId(userId)
-    navigate('/buses', { replace: true });
+    navigate('/dashboard', { replace: true });
   }
   const handlelogout = () => {
     localStorage.removeItem('token');
@@ -45,9 +46,10 @@ const App = () => {
         onThemeToggle={() => setTheme((currentTheme) => currentTheme === 'dark' ? 'light' : 'dark')}
       >
       <Routes>
-        <Route path='/' element={<Navigate to={token ? "/buses" : "/login"}replace />} />       
-        <Route path="/login" element={token? <Navigate to="/buses" replace /> : <LoginForm onLogin={handlelogin}/>}/>
+        <Route path='/' element={<Navigate to={token ? "/dashboard" : "/login"}replace />} />       
+        <Route path="/login" element={token? <Navigate to="/dashboard" replace /> : <LoginForm onLogin={handlelogin}/>}/>
         <Route path="/register" element={<RegisterForm />} />
+        <Route path="/dashboard" element={token ? <Dashboard token={token} userId={userId} /> : <Navigate to="/login" replace />} />
         <Route path="/buses" element={token ? <BusList /> : <Navigate to="/login" replace />} />
         <Route path="/bus/:busId" element={token ? <BusSeats token={token} notify={showToast} /> : <Navigate to="/login" replace />} />
         <Route path="/my-bookings" element={token ? <UserBookings token={token} userId={userId} notify={showToast} /> : <Navigate to="/login" replace />} />

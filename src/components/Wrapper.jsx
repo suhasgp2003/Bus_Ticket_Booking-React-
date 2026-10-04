@@ -23,6 +23,18 @@ const Wrapper = ({ token, handlelogout, theme, onThemeToggle, children }) => {
               {token ? (
                 <div className="flex w-full items-center justify-end gap-3 sm:w-auto">
                   <Link
+                    to="/dashboard"
+                    className="text-sm font-medium text-slate-600 transition hover:text-blue-700"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/buses"
+                    className="text-sm font-medium text-slate-600 transition hover:text-blue-700"
+                  >
+                    Buses
+                  </Link>
+                  <Link
                     to="/my-bookings"
                     className="text-sm font-medium text-slate-600 transition hover:text-blue-700"
                   >
