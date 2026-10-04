@@ -5,7 +5,7 @@ const Wrapper = ({ token, handlelogout, theme, onThemeToggle, children }) => {
         handlelogout()
     }
     return (
-        <div className="min-h-screen bg-slate-100 text-slate-900">
+        <div className="flex min-h-screen flex-col bg-slate-100 text-slate-900">
           <header className="border-b border-slate-200 bg-white shadow-sm">
             <nav className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
               <Link to="/" className="mr-auto text-xl font-bold tracking-tight text-blue-700">
@@ -66,7 +66,25 @@ const Wrapper = ({ token, handlelogout, theme, onThemeToggle, children }) => {
               )}
             </nav>
           </header>
-          <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+          <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+          <footer className="border-t border-slate-200 bg-white">
+            <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+              <p>© {new Date().getFullYear()} GoBus. Travel made simple.</p>
+              <nav className="flex flex-wrap gap-x-4 gap-y-2" aria-label="Footer navigation">
+                {token ? (
+                  <>
+                    <Link to="/buses" className="transition hover:text-blue-700">Find a bus</Link>
+                    <Link to="/my-bookings" className="transition hover:text-blue-700">My bookings</Link>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" className="transition hover:text-blue-700">Login</Link>
+                    <Link to="/register" className="transition hover:text-blue-700">Create account</Link>
+                  </>
+                )}
+              </nav>
+            </div>
+          </footer>
         </div>
     );
     
