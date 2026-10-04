@@ -21,8 +21,7 @@ const LoginForm = ({onLogin}) => {
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/login/`, form);
             setMessage('User logged in successfully!');
             if(onLogin){
-                onLogin(response.data.token, response.data.user_id
-                )
+                onLogin(response.data.token, response.data.user_id, form.username)
             }
             navigate('/');
         } catch {

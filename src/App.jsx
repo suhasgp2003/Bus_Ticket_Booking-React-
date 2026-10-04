@@ -13,6 +13,7 @@ const App = () => {
   const navigate = useNavigate();
   const [token, setToken]=useState(localStorage.getItem('token'))
   const [userId, setUserId]=useState(localStorage.getItem('userId'))
+  const [username, setUsername] = useState(localStorage.getItem('username'));
   const [toast, setToast] = useState(null);
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
 
@@ -23,18 +24,22 @@ const App = () => {
   const showToast = (message, type = 'success') => {
     setToast({ id: Date.now(), message, type });
   };
-  const handlelogin =(token, userId)=>{
+  const handlelogin =(token, userId, username)=>{
     localStorage.setItem('token',token)
     localStorage.setItem('userId',userId)
+    localStorage.setItem('username', username)
     setToken(token)
     setUserId(userId)
+    setUsername(username)
     navigate('/dashboard', { replace: true });
   }
   const handlelogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
+    localStorage.removeItem('username');
     setToken(null)
     setUserId(null)
+    setUsername(null)
     navigate('/login');
   }
   return (
@@ -49,7 +54,7 @@ const App = () => {
         <Route path='/' element={<Navigate to={token ? "/dashboard" : "/login"}replace />} />       
         <Route path="/login" element={token? <Navigate to="/dashboard" replace /> : <LoginForm onLogin={handlelogin}/>}/>
         <Route path="/register" element={<RegisterForm />} />
-        <Route path="/dashboard" element={token ? <Dashboard token={token} userId={userId} /> : <Navigate to="/login" replace />} />
+        <Route path="/dashboard" element={token ? <Dashboard token={token} userId={userId} username={username} /> : <Navigate to="/login" replace />} />
         <Route path="/buses" element={token ? <BusList /> : <Navigate to="/login" replace />} />
         <Route path="/bus/:busId" element={token ? <BusSeats token={token} notify={showToast} /> : <Navigate to="/login" replace />} />
         <Route path="/my-bookings" element={token ? <UserBookings token={token} userId={userId} notify={showToast} /> : <Navigate to="/login" replace />} />

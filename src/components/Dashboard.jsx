@@ -13,7 +13,7 @@ const formatBookingDate = (value) => {
     : new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(date);
 };
 
-const Dashboard = ({ token, userId }) => {
+const Dashboard = ({ token, userId, username }) => {
   const [bookings, setBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(Boolean(token && userId));
   const [loadError, setLoadError] = useState(null);
@@ -85,7 +85,7 @@ const Dashboard = ({ token, userId }) => {
         <div>
           <p className="text-sm font-semibold text-blue-600">Your travel hub</p>
           <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
-            Welcome back
+            Welcome back{username ? ` ${username}` : ""}
           </h1>
           <p className="mt-2 text-slate-600">
             Plan a new journey or keep an eye on your reservations.
