@@ -1,265 +1,397 @@
-# Bus Ticket Booking System - GoBus
+# 🚌 Bus Ticket Booking System
 
-A modern bus ticket booking application built with React and Vite for the frontend, integrated with a Django REST API backend. The app allows travelers to register, log in, browse available buses, select seats, confirm bookings, and view their booking history in a clean and responsive interface.
+A full-stack web application for booking bus tickets online. Features user authentication, real-time seat availability, and secure booking management.
 
-## 🚀 Live Deployment
+## 📌 Project Overview
 
-- **Frontend (Vercel):** [Visit Live App](https://bus-ticket-booking-react.vercel.app)
-- **Backend (Render):** [API Endpoint](https://bus-ticket-booking-backend-zbwn.onrender.com)
+This is a **full-stack MERN-like application** (Django REST + React) that enables users to:
+- Browse available buses with routes and timings
+- View real-time seat availability
+- Book and cancel tickets
+- Manage personal bookings
+- User authentication and authorization
 
-## Overview
+## 🏗️ Architecture
 
-This project simulates a real-world bus booking platform with full-stack functionality. The frontend provides a user-friendly experience for searching and booking tickets, while the backend handles authentication, bus information, bookings, and seat management.
+```
+┌─────────────────┐          ┌──────────────────┐
+│  React Frontend │◄────────►│  Django REST API │
+│  (Vite + Axios) │ (HTTP)   │  (PostgreSQL)    │
+└─────────────────┘          └──────────────────┘
+```
 
-## Tech Stack
+### Backend Structure
+- **Framework**: Django REST Framework
+- **Database**: PostgreSQL
+- **Authentication**: Token-based (Django REST Token Auth)
+- **CORS**: Enabled for frontend communication
 
-### Frontend
-- React 19
-- Vite
-- JavaScript
-- React Router DOM
-- Axios
-- CSS
-- **Deployed on:** Vercel
+### Frontend Structure
+- **Framework**: React 19
+- **Build Tool**: Vite
+- **HTTP Client**: Axios
+- **Routing**: React Router v7
+- **Styling**: Tailwind CSS
+
+## 🚀 Features
+
+### ✨ Core Features
+- **User Management**
+  - User registration and login
+  - Token-based authentication
+  - Personal booking history
+
+- **Bus Management**
+  - Browse available buses
+  - Filter by route, time, and price
+  - View bus features and seat types
+
+- **Seat Management**
+  - Real-time seat availability
+  - Window and aisle seat options
+  - Visual seat layout
+
+- **Booking System**
+  - Book multiple seats at once
+  - Atomic transactions (all-or-nothing)
+  - Prevent double-booking with database locks
+  - Cancel bookings and free up seats
+
+### 🔒 Advanced Features
+- **Transaction Safety**: Uses database transactions to prevent race conditions
+- **Concurrency Control**: `select_for_update()` ensures seat locking during booking
+- **Input Validation**: Comprehensive error handling for invalid requests
+- **Authorization**: Users can only view/manage their own bookings
+
+## 📊 Database Models
+
+```python
+Bus
+├── bus_name, bus_number (unique)
+├── origin, destination
+├── features, start_time, reach_time
+├── no_of_seats, price
+└── Related: seats, bookings
+
+Seat
+├── bus_id (FK → Bus)
+├── seat_number, row, column
+├── is_booked (Boolean)
+├── seat_type (Window/Aisle)
+└── Related: bookings
+
+Booking
+├── user_id (FK → User)
+├── bus_id (FK → Bus)
+├── seat_id (FK → Seat)
+└── booking_time (auto_now_add)
+```
+
+## 🛠️ Tech Stack
 
 ### Backend
-- Python
-- Django
-- Django REST Framework
-- PostgreSQL
-- Token-based authentication
-- **Deployed on:** Render
+```
+Django==6.1.1
+djangorestframework==3.18.1
+django-cors-headers==4.9.0
+psycopg==3.3.5 (PostgreSQL driver)
+python-dotenv==1.2.3
+```
 
-## Key Features
+### Frontend
+```
+React==19.2.8
+Vite==8.2.2
+Tailwind CSS==4.3.3
+Axios==1.20.0
+React Router==7.18.3
+```
 
-- ✅ User registration and login with secure authentication
-- ✅ Dashboard overview after login
-- ✅ Browse available buses and routes
-- ✅ View bus details, timings, seat availability, and pricing
-- ✅ Select and reserve seats interactively
-- ✅ Book multiple seats in a single transaction
-- ✅ Prevent invalid or duplicate seat bookings
-- ✅ View personal booking history
-- ✅ Cancel existing bookings
-- ✅ Light/Dark theme toggle
-- ✅ Responsive and modern UI
-- ✅ Production-ready with CI/CD pipelines
+## 📦 Installation
 
-## Project Structure
+### Prerequisites
+- Python 3.8+
+- Node.js 16+
+- PostgreSQL 12+
 
+### Backend Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/suhasgp2003/Bus_Ticket_Booking-Backend-.git
+   cd Bus_Ticket_Booking-Backend-
+   ```
+
+2. **Create virtual environment**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Configure environment variables**
+   ```bash
+   # Create .env file
+   touch .env
+   ```
+   ```env
+   DEBUG=True
+   SECRET_KEY=your-secret-key-here
+   DATABASE_URL=postgresql://user:password@localhost:5432/bus_booking
+   ALLOWED_HOSTS=localhost,127.0.0.1
+   ```
+
+   Email is written to the server console by default. To deliver email through
+   an SMTP provider in production, add the following values to `.env`:
+   ```env
+  DEFAULT_FROM_EMAIL=youraddress@gmail.com
+  EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+  EMAIL_HOST=smtp.gmail.com
+  EMAIL_PORT=587
+  EMAIL_HOST_USER=youraddress@gmail.com
+  EMAIL_HOST_PASSWORD=your-16-character-google-app-password
+  EMAIL_USE_TLS=true
+   ```
+
+5. **Setup database**
+   ```bash
+   python manage.py makemigrations
+   python manage.py migrate
+   python manage.py createsuperuser  # For admin panel
+   ```
+
+6. **Run the server**
+   ```bash
+   python manage.py runserver
+   ```
+   API will be available at `http://localhost:8000/`
+
+### Frontend Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/suhasgp2003/Bus_Ticket_Booking-React-.git
+   cd Bus_Ticket_Booking-React-
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure API URL**
+   ```bash
+   # Create .env.local
+   VITE_API_URL=http://localhost:8000/api
+   ```
+
+4. **Run development server**
+   ```bash
+   npm run dev
+   ```
+   Frontend will be available at `http://localhost:5173/`
+
+## 🔌 API Endpoints
+
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register/` | Register new user |
+| POST | `/api/auth/login/` | Login user |
+
+### Buses
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/buses/` | List all buses |
+| POST | `/api/buses/` | Create bus (Admin) |
+| GET | `/api/buses/{id}/` | Get bus details |
+| PUT | `/api/buses/{id}/` | Update bus |
+| DELETE | `/api/buses/{id}/` | Delete bus |
+
+### Bookings
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/bookings/` | Create booking |
+| DELETE | `/api/bookings/cancel/` | Cancel booking |
+| GET | `/api/bookings/user/{user_id}/` | Get user's bookings |
+
+### Seats
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/seats/?bus_id=1` | Get bus seats |
+
+## 📝 Example API Usage
+
+### Register User
 ```bash
-Bus_Ticket_Booking-React-
-├── src/
-│   ├── components/
-│   │   ├── BusList.jsx            # Browse available buses
-│   │   ├── BusSeats.jsx           # Seat selection interface
-│   │   ├── Dashboard.jsx          # User dashboard
-│   │   ├── LoginForm.jsx          # Login page
-│   │   ├── RegisterForm.jsx       # Registration page
-│   │   ├── UserBookings.jsx       # Booking history
-│   │   ├── Wrapper.jsx            # Layout wrapper with navbar
-│   │   ├── Toast.jsx              # Notifications
-│   │   └── ConfirmationDialog.jsx # Confirmation modals
-│   ├── App.jsx                    # Main app routes
-│   ├── main.jsx                   # Entry point
-│   ├── App.css
-│   ├── index.css
-│   └── ...
-├── index.html
-├── package.json
-├── package-lock.json
-├── vite.config.js
-├── eslint.config.js
-├── .gitignore
-├── README.md
-└── .env.development
+curl -X POST http://localhost:8000/api/auth/register/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "john_doe",
+    "email": "john@example.com",
+    "password": "secure_password"
+  }'
 ```
 
-## Prerequisites
-
-Before running the frontend locally, make sure you have:
-
-- Node.js 18+ installed
-- npm or yarn
-- Internet connection for backend API access (or local backend running)
-
-## Installation & Setup
-
-### 1. Clone the repository
-
+### Book Tickets
 ```bash
-git clone https://github.com/suhasgp2003/Bus_Ticket_Booking-React-.git
-cd Bus_Ticket_Booking-React-
+curl -X POST http://localhost:8000/api/bookings/ \
+  -H "Authorization: Token your_token_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "seats": [1, 2, 3]
+  }'
 ```
 
-### 2. Install dependencies
-
+### Cancel Booking
 ```bash
-npm install
+curl -X DELETE http://localhost:8000/api/bookings/cancel/ \
+  -H "Authorization: Token your_token_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "seats": [1, 2]
+  }'
 ```
 
-### 3. Configure Environment Variables
+## 🎯 Key Implementation Highlights
 
-Create a `.env.local` file in the root directory:
-
-```env
-VITE_API_URL=http://localhost:8000
-# For production, use your Render backend URL:
-# VITE_API_URL=https://your-render-backend-url.onrender.com
+### 1. **Atomic Transactions**
+```python
+with transaction.atomic():
+    seats = Seat.objects.select_for_update().filter(id__in=seat_ids)
+    # Book seats safely without race conditions
 ```
 
-### 4. Start the development server
-
-```bash
-npm run dev
+### 2. **Authorization**
+```python
+class BookingView(APIView):
+    permission_classes = [IsAuthenticated]
+    # Only authenticated users can book
 ```
 
-### 5. Open the app in your browser
-
-```bash
-http://localhost:5173
+### 3. **Input Validation**
+```python
+# Validates duplicate seats, existence, and availability
+if len(seat_ids) != len(set(seat_ids)):
+    return Response({"error": "Duplicate seat IDs"})
 ```
 
-## Backend Setup
-
-This frontend is designed to work with the backend repository:
-
-**GitHub:** https://github.com/suhasgp2003/Bus_Ticket_Booking-Backend-
-
-**Render Deployment:** https://your-render-backend-url.onrender.com
-
-### Backend API Endpoints
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/auth/register/` | POST | User registration |
-| `/api/auth/login/` | POST | User login |
-| `/api/buses/` | GET | Fetch all buses |
-| `/api/buses/{id}/` | GET | Get bus details |
-| `/api/seats/{busId}/` | GET | Get available seats |
-| `/api/bookings/` | GET, POST | List/create bookings |
-| `/api/bookings/{id}/` | DELETE | Cancel booking |
-
-## Environment Configuration
-
-### Frontend (.env.local)
-
-```env
-VITE_API_URL=https://your-render-backend-url.onrender.com
+### 4. **CORS Integration**
+```python
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+]
 ```
 
-The app uses local storage for:
-- Authentication tokens
-- User ID and username
-- Theme preference (light/dark)
-
-## Available Scripts
-
-```bash
-npm run dev       # Start development server (http://localhost:5173)
-npm run build     # Build for production
-npm run preview   # Preview production build locally
-npm run lint      # Run ESLint checks
-```
-
-## App User Flow
-
-1. **Authentication:** User registers or logs in
-2. **Dashboard:** User lands on the dashboard with navigation options
-3. **Browse Buses:** User explores available buses and routes
-4. **Select Seats:** User picks available seats for a specific bus
-5. **Confirm Booking:** User completes the booking transaction
-6. **Manage Bookings:** User can view or cancel bookings later
-7. **Theme Toggle:** User can switch between light and dark modes
-
-## Deployment
-
-### Frontend (Vercel)
-
-1. Push your code to GitHub
-2. Connect your GitHub repo to Vercel
-3. Set environment variable `VITE_API_URL` in Vercel dashboard
-4. Deploy automatically on every push to `main`
-
-### Backend (Render)
-
-1. Connect your GitHub repo to Render
-2. Configure environment variables (database, secret keys, etc.)
-3. Deploy as a Web Service
-4. Update `VITE_API_URL` in frontend with Render URL
-
-## Screenshots
-
-Add screenshots of the following features:
-- Login & Registration pages
-- Dashboard overview
-- Bus listing with filters
-- Seat selection interface
-- Booking confirmation
-- User booking history
-- Dark mode toggle
-
-## Future Improvements
-
-- 🔐 Payment gateway integration (Razorpay, Stripe)
-- 🔍 Advanced search and filter by route/date/price
-- 🗺️ Better seat map visualizations
-- 📊 Admin dashboard for bus and booking management
-- 📈 Booking analytics and reports
-- 🔔 Real-time notifications
-- 💬 Customer support chat
-- ⭐ User reviews and ratings
-- 📱 Mobile app (React Native)
-- 🚀 WebSocket integration for live seat updates
-
-## Learning Outcomes
+## 📚 Learning Outcomes
 
 This project demonstrates:
+- ✅ Full-stack web development
+- ✅ RESTful API design
+- ✅ Database modeling and relationships
+- ✅ Authentication and authorization
+- ✅ Transaction management & concurrency control
+- ✅ Frontend-backend integration
+- ✅ Error handling and validation
+- ✅ CORS and HTTP communication
 
-- React 19 with hooks and functional components
-- React Router v7 for navigation
-- API integration with Axios
-- Form handling and validation
-- State management and local storage
-- Responsive design with CSS
-- Full-stack development workflow
-- Git and GitHub collaboration
-- Deployment pipelines (Vercel + Render)
+## 🐛 Known Limitations & Future Improvements
 
-## Troubleshooting
+### Current Limitations
+- [ ] Payment integration
+- [x] Email notifications for account creation, booking confirmation, and cancellation
+- [ ] Advanced filtering (date range, price range)
+- [ ] User reviews and ratings
+- [ ] Admin dashboard
+- [ ] Unit tests and integration tests
+- [ ] Deployment configuration
 
-### CORS Issues
-If you see CORS errors, ensure your backend has `CORS_ALLOWED_ORIGINS` configured to include your frontend URL.
+### Planned Features
+- 🔄 Payment gateway (Razorpay/Stripe)
+- 📧 Email confirmations
+- 📊 Analytics dashboard
+- 🗺️ Map integration for routes
+- ⭐ User ratings and reviews
+- 📱 Mobile app
 
-### Token Expired
-The app stores tokens in localStorage. Clear localStorage if you encounter authentication issues:
-```javascript
-localStorage.clear()
+## 🧪 Testing
+
+### Run Tests (Backend)
+```bash
+python manage.py test
 ```
 
-### Backend Connection Failed
-1. Check if backend is running on configured URL
-2. Verify `VITE_API_URL` environment variable
-3. Check browser console for detailed error messages
-4. Ensure backend is not on localhost if frontend is deployed
+### Run Linting (Frontend)
+```bash
+npm run lint
+```
 
-## Contributing
+## 📂 Project Structure
 
-Feel free to fork this repository and contribute improvements via pull requests.
+### Backend
+```
+Bus_Ticket_Booking-Backend-/
+├── TransportNetwork/       # Project settings
+│   ├── settings.py
+│   ├── urls.py
+│   ├── wsgi.py
+│   └── asgi.py
+├── bookings/               # Main app
+│   ├── models.py          # DB Models: Bus, Seat, Booking
+│   ├── views.py           # API Views
+│   ├── serializers.py     # DRF Serializers
+│   ├── urls.py            # URL routing
+│   └── admin.py           # Admin configuration
+├── manage.py
+└── requirements.txt
+```
 
-## Author
+### Frontend
+```
+Bus_Ticket_Booking-React-/
+├── src/
+│   ├── components/        # React components
+│   ├── pages/            # Page components
+│   ├── services/         # API service layer
+│   ├── App.jsx
+│   └── main.jsx
+├── public/
+├── package.json
+├── vite.config.js
+└── tailwind.config.js
+```
 
-**Suhas G P**
+## 🤝 Contributing
 
-- GitHub: https://github.com/suhasgp2003
-- Portfolio: [Add your portfolio link]
+Contributions are welcome! Please follow these steps:
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## License
+## 📄 License
 
-This project is provided for educational and portfolio use. Consider adding an appropriate license (MIT, Apache, etc.) if publishing publicly.
+This project is open source and available under the MIT License.
+
+## 👨‍💻 Author
+
+**Suhas GP**
+- GitHub: [@suhasgp2003](https://github.com/suhasgp2003)
+- Portfolio: [View all projects](https://github.com/suhasgp2003?tab=repositories)
+
+## 📞 Support
+
+For issues and questions:
+- Open an issue on GitHub
+- Check existing issues for solutions
+- Contact via email or GitHub profile
 
 ---
 
-**Last Updated:** October 2026
-
-For questions or issues, please create a GitHub issue in the repository.
+**Made with ❤️ | Last Updated: 2026**

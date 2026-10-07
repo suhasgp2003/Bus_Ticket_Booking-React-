@@ -73,7 +73,7 @@ const UserBookings = ({ token, userId, notify }) => {
 
     setCancellingSeatIds((currentIds) => [...currentIds, seatId]);
     try {
-      const response = await axios.delete(
+      await axios.delete(
         `${import.meta.env.VITE_API_URL}/booking/cancel/`,
         {
           headers: { Authorization: `Token ${token}` },
@@ -83,7 +83,7 @@ const UserBookings = ({ token, userId, notify }) => {
       setBookings((currentBookings) =>
         currentBookings.filter((item) => item.id !== booking.id),
       );
-      notify(response.data?.message || "Booking cancelled successfully.");
+      notify("Booking cancelled. A cancellation email has been sent.");
     } catch (error) {
       notify(
         error.response?.data?.error ||

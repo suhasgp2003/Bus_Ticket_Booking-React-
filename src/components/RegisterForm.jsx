@@ -2,6 +2,8 @@ import { useState} from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
+const registrationSuccessMessage = 'Account created successfully. Please check your email for confirmation.';
+
 const RegisterForm = () => {
     const [form,setForm]= useState({
         username:'',
@@ -20,7 +22,7 @@ const RegisterForm = () => {
         e.preventDefault();
         try {
             await axios.post(`${import.meta.env.VITE_API_URL}/register/`, form);
-            setMessage('Registration successfull!');
+            setMessage(registrationSuccessMessage);
         } catch (error) {
   const data = error.response?.data;
 
@@ -35,7 +37,7 @@ const RegisterForm = () => {
 }
     };
 
-  const isSuccess = message === 'Registration successfull!';
+  const isSuccess = message === registrationSuccessMessage;
 
   return (
     <section aria-labelledby="signup-title" className="mx-auto w-full max-w-5xl py-2 sm:py-6 lg:py-10">
@@ -105,7 +107,7 @@ const RegisterForm = () => {
                 <svg aria-hidden="true" className="mt-0.5 shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="9" />{isSuccess ? <path d="m7 12 3 3 7-7" /> : <path d="M12 7v6m0 3v1" />}</svg>
                 <div>
                   <p className="font-semibold">{isSuccess ? 'Your account is ready' : 'We couldn’t create your account'}</p>
-                  <p className="break-words">{isSuccess ? 'Registration successful. Log in to start planning your trip.' : message}</p>
+                  <p className="break-words">{message}</p>
                 </div>
               </div>
             )}

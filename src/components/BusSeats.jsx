@@ -134,7 +134,7 @@ const BusSeats = ({ token, notify }) => {
         ),
       );
       setSelectedSeatIds([]);
-      notify(`${selectedSeatIds.length} seat${selectedSeatIds.length === 1 ? "" : "s"} booked successfully!`);
+      notify("Booking confirmed. A confirmation email has been sent.");
     } catch (error) {
       notify(error.response?.data?.error || "Booking failed. Please try again.", "error");
     } finally {
